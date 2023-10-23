@@ -1,0 +1,28 @@
+version: '3'
+services:
+  core:
+    build: ./core 
+    ports: 
+      - "5000:5000"
+    depends_on:
+      - redis
+
+  ui:
+    build: ./ui
+    ports: 
+      - "3000:3000"
+    depends_on:
+      - core
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  
+  nginx:
+    build: ./.nginx
+    depends_on:
+      - core
+      - ui
+    ports:
+      - "80:80"

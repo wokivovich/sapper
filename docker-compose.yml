@@ -2,31 +2,45 @@ version: '3'
 services:
   core:
     container_name: core
+    image: core
     build: ./core 
     ports: 
       - "5000:5000"
     depends_on:
       - redis
+    networks:
+      - mynetwork
 
   ui:
     container_name: ui
+    image: ui
     build: ./ui
     ports: 
       - "3000:3000"
     depends_on:
       - core
+    networks:
+      - mynetwork
 
   redis:
     container_name: redis
     image: redis
     ports:
       - "6379:6379"
+    networks:
+      - mynetwork
   
   nginx:
     container_name: nginx
+    image: nginx
     build: ./.nginx
     depends_on:
       - core
       - ui
     ports:
       - "80:80"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:

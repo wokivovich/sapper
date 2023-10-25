@@ -76,11 +76,13 @@ export default {
   },
 
   mounted() {
-    axios.get('http://localhost:5000/api/leaders').then(
+    axios.get('/api/leaders').then(
         response => (
             this.leaders.push(response.data)
         )
-    )
+    ).catch(error => {
+        console.error("Ощибка подключения к бэкенду:", error);
+    })
     
   },
 
@@ -96,7 +98,7 @@ export default {
   methods: {
     startGame(difficult) {
         axios.get(
-            'http://localhost:5000/api/start/' + difficult
+            '/api/start/' + difficult
         ).then(response => (
             this.session = response.data.sessionId,
             this.answer = response.data.field,
@@ -106,7 +108,7 @@ export default {
 
     play(x, y) {
         axios.post(
-            'http://localhost:5000/api/play',
+            '/api/play',
             [
                 this.session, y, x
             ],  
@@ -117,7 +119,7 @@ export default {
     },
 
     sendRecord() {
-        axios.post('http://localhost:5000/api/record', {
+        axios.post('/api/record', {
             time: this.time,    
             name: this.name,
         }).then(this.name = "")

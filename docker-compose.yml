@@ -1,6 +1,7 @@
 version: '3'
 services:
   core:
+    container_name: core
     build: ./core 
     ports: 
       - "5000:5000"
@@ -8,6 +9,7 @@ services:
       - redis
 
   ui:
+    container_name: ui
     build: ./ui
     ports: 
       - "3000:3000"
@@ -15,11 +17,13 @@ services:
       - core
 
   redis:
+    container_name: redis
     image: redis
     ports:
       - "6379:6379"
   
   nginx:
+    container_name: nginx
     build: ./.nginx
     depends_on:
       - core

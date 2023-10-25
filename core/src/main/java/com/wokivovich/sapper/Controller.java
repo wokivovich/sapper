@@ -15,7 +15,7 @@ import java.util.Random;
 
 @RequestMapping(
         produces = "application/json")
-@CrossOrigin(origins = {"http://localhost:3000", "http://ui:3000", "http://localhost"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://ui:3000", "http://localhost", "http://192.168.1.12:3000"})
 @RestController
 public class Controller {
 

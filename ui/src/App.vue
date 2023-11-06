@@ -36,9 +36,4 @@ export default {
     
 }
 
-.app {
-}
-
-
-
 </style>

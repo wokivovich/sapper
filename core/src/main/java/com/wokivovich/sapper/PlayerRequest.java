@@ -1,4 +1,4 @@
 package com.wokivovich.sapper;
 
-public record PlayerRequest(String time, String name) {
+public record PlayerRequest(String time, String name, String difficult) {
 }

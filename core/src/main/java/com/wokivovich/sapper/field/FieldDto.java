@@ -12,6 +12,8 @@ public class FieldDto {
             for (int j = 0; j < fieldBlocks.length; j++) {
                 if (fieldBlocks[i][j].isVisible) {
                     res[i][j] = fieldBlocks[i][j].countOfBombs + "";
+                } else if (!fieldBlocks[i][j].isActive) {
+                    res[i][j] = "disable";
                 }
 
             }

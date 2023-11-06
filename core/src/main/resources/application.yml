@@ -1,2 +1,23 @@
+spring:
+  profiles:
+    active: production
+  data:
+    redis:
+      host: localhost
+      port: 6379
 server:
   port: 5000
+
+# develop
+---
+spring:
+  config:
+    activate:
+      on-profile: develop
+
+# production
+---
+spring:
+  config:
+    activate:
+      on-profile: production

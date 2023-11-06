@@ -20,8 +20,18 @@ public class Reader {
 
     }
 
+    public void flagPosting(GameSession session, int x, int y) {
+        if (!session.getField()[y][x].isVisible()) {
+            if (session.getField()[y][x].isActive()) {
+                session.getField()[y][x].setActive(false);
+            } else {
+                session.getField()[y][x].setActive(true);
+            }
+        }
+    }
+
     private void setVisibleNearestBlocks(GameSession session, int x, int y, int level) {
-        session.getField()[y][x].setVisible();
+        session.getField()[y][x].setVisible(true);
         session.setBlocksLost(session.getBlocksLost() - 1);
         if (session.getField()[y][x].getCountOfBombs() == 0) {
 

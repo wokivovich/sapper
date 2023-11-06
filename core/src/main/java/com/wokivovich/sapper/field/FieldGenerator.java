@@ -25,13 +25,13 @@ public class FieldGenerator {
                 if (countOfBombs > 0) {
                     int bomb = (new Random()).nextInt(0, level);
                     boolean hasBomb = bomb == 5;
-                    field[i][j] = new FieldBlock(hasBomb, false, 0);
+                    field[i][j] = new FieldBlock(hasBomb, false, true, 0);
 
                     if (hasBomb) {
                         countOfBombs--;
                     }
                 } else {
-                    field[i][j] = new FieldBlock(false, false, 0);
+                    field[i][j] = new FieldBlock(false, false, true, 0);
                 }
 
             }

@@ -20,14 +20,12 @@ import java.util.Random;
 public class Controller {
 
     FieldGenerator generator;
-    View view;
     Reader reader;
     LeaderBoardService service;
     Map<Integer, GameSession> sessions = new HashMap();
 
-    public Controller(FieldGenerator generator, View view, Reader reader, LeaderBoardService service) {
+    public Controller(FieldGenerator generator, Reader reader, LeaderBoardService service) {
         this.generator = generator;
-        this.view = view;
         this.reader = reader;
         this.service = service;
     }
@@ -64,18 +62,31 @@ public class Controller {
         return converter.sessionToDtoConverter(session);
     }
 
+    @PostMapping("/api/flag")
+    public SessionDto postFlag(@RequestBody int[] coordinates) {
+        GameSession session = sessions.get(coordinates[0]);
+
+        SessionDtoConverter converter = new SessionDtoConverter();
+
+        reader.flagPosting(session, coordinates[1], coordinates[2]);
+        sessions.put(session.getSessionId(), session);
+
+        return converter.sessionToDtoConverter(session);
+    }
+
     @PostMapping("/api/record")
     public void recordResult(@RequestBody PlayerRequest player) {
 
         service.addPlayer(Player.builder()
                 .time(Integer.parseInt(player.time()))
                 .name(player.name())
-                .build()
+                .build(),
+                Integer.parseInt(player.difficult())
         );
     }
 
     @GetMapping("/api/leaders")
-    public List<Player> getLeaderBoard() {
+    public List<List<Player>> getLeaderBoard() {
 
         return service.getLeaders();
     }

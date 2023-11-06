@@ -1,18 +1,58 @@
 <template>
-    <div>
-        <div class="timer">
-            <p>{{formattedElapsedTime}}</p>
-        </div>
-        <div class="difficult">
-            <form @submit.prevent>
-                <button class="level" @click="startGame(8)">Easy</button>
-                <button class="level" @click="startGame(12)">Medium</button>
-                <button class="level" @click="startGame(20)">Hard</button>
-            </form>
+    <div class="container">
+        <div class="info">
+            <div class="timer">
+                <p>{{formattedElapsedTime}}</p>
+            </div>
+            <div class="difficult">
+                <form @submit.prevent>
+                    <button class="level" @click="startGame(8)">8</button>
+                    <button class="level" @click="startGame(12)">12</button>
+                    <button class="level" @click="startGame(20)">20</button>
+                </form>
+            </div>
+            <div class="leaderboard">
+                <h3>Easy level top</h3>
+                <table v-for:="leader in easyTop">
+                    <tr v-for:="player in leader">
+                        <td>
+                            {{ player.name }} -
+                        </td>
+                        <td>
+                            {{ player.time }}
+                        </td>
+                    </tr>
+                </table>
+                <h3>Medium level top</h3>
+                <table v-for:="leader in mediumTop">
+                    <tr v-for:="player in leader">
+                        <td>
+                            {{ player.name }} -
+                        </td>
+                        <td>
+                            {{ player.time }}
+                        </td>
+                    </tr>
+                </table>
+                <h3>Hard level top</h3>
+                <table v-for:="leader in hardTop">
+                    <tr v-for:="player in leader">
+                        <td>
+                            {{ player.name }} -
+                        </td>
+                        <td>
+                            {{ player.time }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
         <div v-if="session === 0"></div>
-        <div class="game" v-else>
-            <div class="result" v-if="gameStatus === 'LOOSE'">{{ stop() }}<strong>You loose</strong></div>
+
+        <div v-else>
+            <div class="result" 
+                v-if="gameStatus === 'LOOSE'">{{ stop() }}<strong>You loose</strong>
+            </div>
                 <div class="result" v-else-if="gameStatus === 'WIN'">
                     {{ stop() }}
                     <strong>You win!!!</strong>
@@ -23,39 +63,48 @@
                     </form>
                 </div>
             <div v-else>
-                <form @submit.prevent>
-                    <div class="line" v-for:="(line, index1) in answer">
-                        <div>
-                            <button 
-                            class="fieldBlock" 
-                            v-for:="(block, index2) in line"
-                            @click="play(index1, index2)">
-                                <label class="blk" v-if="block === null">X</label>
-                                <label class="blk" v-else-if="block === '0'"></label>
-                                <label class="blk" v-else>{{ block }}</label>
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                <div  class="field"  v-for:="(row, rowIndex) in answer" :key="rowIndex">
+                    <span class="row" 
+                        v-for:="(cell, cellIndex) in row"
+                        :key="cellIndex"
+                        @click="play(rowIndex, cellIndex)"
+                        @contextmenu.prevent="handleContextMenu"
+                        @click.right.prevent = "performRightClickAction(rowIndex, cellIndex)"
+                        >
+                        
+                        <button class="fieldblock"
+                            v-if="cell === null"
+                            :style="{color: 'grey'}"
+                            >X
+                        </button>
+                        <button class="fieldblock"
+                            v-else-if="cell === '0'"
+                            disabled
+                            :style="{color: 'grey'}"
+                            >0
+                        </button>
+                        <button class="fieldblock"
+                            v-else-if="cell === 'disable'"
+                            disabled
+                            :style="{color: 'red'}"
+                            >F
+                        </button>
+                        <button class="fieldblock"
+                            v-else
+                            >{{ cell }}
+                        </button>
+
+                    </span>
+                </div>
             </div>
-        </div> 
-        <div class="leaderBoard">
-            <h3>Top players</h3>
-            <table v-for:="leader in leaders">
-                <tr v-for:="player in leader">
-                    <td>
-                        {{ player.name }} -
-                    </td>
-                    <td>
-                        {{ player.time }}
-                    </td>
-                </tr>
-            </table>
         </div>
+         
     </div>   
 </template>
 <script>
 import axios from "axios";
+
+const baseURL = process.env.VUE_APP_API_URL;
 
 export default {
     data() {
@@ -63,22 +112,28 @@ export default {
       name: null,
       answer: [null],
       gameStatus: '',
-      leaders: [],
+      easyTop: [],
+      mediumTop: [],
+      hardTop: [],
       coordinate: {
         x: null,
         y: null
       },
       session: 0,
       time: 0,
-            timer: undefined
+      timer: undefined,
+      difficult: null
+      
       
     };
   },
 
   mounted() {
-    axios.get('/api/leaders').then(
+    axios.get(baseURL + '/api/leaders').then(
         response => (
-            this.leaders.push(response.data)
+            this.easyTop.push(response.data[0]),
+            this.mediumTop.push(response.data[1]),
+            this.hardTop.push(response.data[2])
         )
     ).catch(error => {
         console.error("Ощибка подключения к бэкенду:", error);
@@ -97,8 +152,9 @@ export default {
 
   methods: {
     startGame(difficult) {
+        this.difficult = difficult;
         axios.get(
-            '/api/start/' + difficult
+            baseURL + '/api/start/' + difficult
         ).then(response => (
             this.session = response.data.sessionId,
             this.answer = response.data.field,
@@ -108,7 +164,7 @@ export default {
 
     play(x, y) {
         axios.post(
-            '/api/play',
+            baseURL + '/api/play',
             [
                 this.session, y, x
             ],  
@@ -118,10 +174,26 @@ export default {
         ))
     },
 
+    handleContextMenu(event) {
+      event.preventDefault();
+    },
+
+    performRightClickAction(x, y) {
+      axios.post(
+        baseURL + '/api/flag',
+        [
+            this.session, y, x
+        ], 
+      ).then(response => (
+        this.answer = response.data.field
+      ))
+    },
+
     sendRecord() {
-        axios.post('/api/record', {
+        axios.post(baseURL + '/api/record', {
             time: this.time,    
             name: this.name,
+            difficult: this.difficult
         }).then(this.name = "")
     },
 
@@ -143,37 +215,42 @@ export default {
 </script>
 
 <style scoped>
-.difficult {
-}
-.line {
-    margin: auto;
-    width: 10000px;
-}
-.fieldBlock {
-    height:100px;
-    width:100px;
-    background-color: grey;
+
+.container {
+    display: flex;
 }
 
-.blk {
-    margin-left: 1px;
-    font-size: 50px;
+.timer {
+    font-size: 30px;
+}
+
+.difficult {
+    width: 150px;
 }
 
 .level {
-    font-size: 100px;
-    margin-left: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+}
+.field {
+    width: 1000px;
+}
+.row {
+    display: inline-flex;
+    background-color: grey;
+}
+
+.fieldblock {
+    height:20px;
+    width:20px;
+    background-color: grey;
+    font-size: 10px;
+    margin: 1px;
 }
 
 .result {
     size: 500;
 }
 
-.timer {
-    font-size: 50px;
-    float: left;
-}
-
-.leaderboard {
-}
 </style>

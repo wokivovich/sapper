@@ -1,7 +1,8 @@
 # Maven
 target/
 *.iml
-.idea/
+.idea
+.mvn
 mvnw
 mvnw.cmd
 

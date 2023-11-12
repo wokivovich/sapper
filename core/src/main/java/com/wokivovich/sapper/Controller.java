@@ -1,11 +1,13 @@
 package com.wokivovich.sapper;
 
-import com.wokivovich.sapper.db.LeaderBoardService;
-import com.wokivovich.sapper.db.Player;
-import com.wokivovich.sapper.field.FieldGenerator;
-import com.wokivovich.sapper.field.GameSession;
-import com.wokivovich.sapper.field.SessionDto;
-import com.wokivovich.sapper.field.SessionDtoConverter;
+import com.wokivovich.sapper.service.LeaderBoardService;
+import com.wokivovich.sapper.domain.Player;
+import com.wokivovich.sapper.dto.PlayerRequest;
+import com.wokivovich.sapper.service.GameFieldService;
+import com.wokivovich.sapper.domain.GameSession;
+import com.wokivovich.sapper.dto.SessionDto;
+import com.wokivovich.sapper.dto.SessionDtoConverter;
+import com.wokivovich.sapper.service.GameService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -14,70 +16,67 @@ import java.util.Map;
 import java.util.Random;
 
 @RequestMapping(
+        path = "/api",
         produces = "application/json")
-@CrossOrigin(origins = {"http://localhost:3000", "http://ui:3000", "http://localhost", "http://192.168.1.12:3000"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://ui:3000"})
 @RestController
 public class Controller {
 
-    FieldGenerator generator;
-    Reader reader;
-    LeaderBoardService service;
+    GameFieldService gameFieldService;
+    GameService gameService;
+    LeaderBoardService leaderBoardService;
     Map<Integer, GameSession> sessions = new HashMap();
 
-    public Controller(FieldGenerator generator, Reader reader, LeaderBoardService service) {
-        this.generator = generator;
-        this.reader = reader;
-        this.service = service;
+    public Controller(GameFieldService gameFieldService, GameService gameService, LeaderBoardService leaderBoardService) {
+        this.gameFieldService = gameFieldService;
+        this.gameService = gameService;
+        this.leaderBoardService = leaderBoardService;
     }
 
-    @GetMapping("/")
-    public void greeting() {
-    }
-
-    @GetMapping("/api/start/{id}")
+    @GetMapping("/start/{id}")
     public SessionDto startGame(@PathVariable("id") int difficult) {
         SessionDtoConverter converter = new SessionDtoConverter();
         GameSession gameSession = GameSession.builder()
                 .sessionId((new Random()).nextInt())
                 .gameStatus("EMPTY")
-                .field(generator.createField(difficult))
+                .field(gameFieldService.createField(difficult))
                 .blocksLost((difficult * difficult) - difficult)
                 .difficult(difficult)
                 .build();
 
         sessions.put(gameSession.getSessionId(), gameSession);
 
-        return converter.sessionToDtoConverter(gameSession);
+        return converter.convert(gameSession);
     }
 
-    @PostMapping("/api/play")
+    @PostMapping("/play")
     public SessionDto chooseBlock(@RequestBody int[] coordinates) {
         GameSession session = sessions.get(coordinates[0]);
 
         SessionDtoConverter converter = new SessionDtoConverter();
 
-        session.setGameStatus(reader.play(session, session.getDifficult(), coordinates[1], coordinates[2]));
+        session.setGameStatus(gameService.play(session, session.getDifficult(), coordinates[1], coordinates[2]));
         sessions.put(session.getSessionId(), session);
 
-        return converter.sessionToDtoConverter(session);
+        return converter.convert(session);
     }
 
-    @PostMapping("/api/flag")
+    @PostMapping("/flag")
     public SessionDto postFlag(@RequestBody int[] coordinates) {
         GameSession session = sessions.get(coordinates[0]);
 
         SessionDtoConverter converter = new SessionDtoConverter();
 
-        reader.flagPosting(session, coordinates[1], coordinates[2]);
+        gameService.flagPosting(session, coordinates[1], coordinates[2]);
         sessions.put(session.getSessionId(), session);
 
-        return converter.sessionToDtoConverter(session);
+        return converter.convert(session);
     }
 
-    @PostMapping("/api/record")
+    @PostMapping("/record")
     public void recordResult(@RequestBody PlayerRequest player) {
 
-        service.addPlayer(Player.builder()
+        leaderBoardService.addPlayer(Player.builder()
                 .time(Integer.parseInt(player.time()))
                 .name(player.name())
                 .build(),
@@ -85,10 +84,10 @@ public class Controller {
         );
     }
 
-    @GetMapping("/api/leaders")
+    @GetMapping("/leaders")
     public List<List<Player>> getLeaderBoard() {
 
-        return service.getLeaders();
+        return leaderBoardService.getLeaders();
     }
 
 }

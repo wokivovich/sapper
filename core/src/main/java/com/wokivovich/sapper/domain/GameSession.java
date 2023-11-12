@@ -1,4 +1,4 @@
-package com.wokivovich.sapper.field;
+package com.wokivovich.sapper.domain;
 
 import lombok.Builder;
 import lombok.Data;

@@ -16,10 +16,10 @@
                 <table v-for:="leader in easyTop">
                     <tr v-for:="player in leader">
                         <td>
-                            {{ player.name }} -
+                            {{ player.name }} 
                         </td>
                         <td>
-                            {{ player.time }}
+                            - {{ Math.round(player.time / 1000) }}
                         </td>
                     </tr>
                 </table>
@@ -27,10 +27,10 @@
                 <table v-for:="leader in mediumTop">
                     <tr v-for:="player in leader">
                         <td>
-                            {{ player.name }} -
+                            {{ player.name }} 
                         </td>
                         <td>
-                            {{ player.time }}
+                            - {{ Math.round(player.time / 1000) }}
                         </td>
                     </tr>
                 </table>
@@ -38,10 +38,10 @@
                 <table v-for:="leader in hardTop">
                     <tr v-for:="player in leader">
                         <td>
-                            {{ player.name }} -
+                            {{ player.name }} 
                         </td>
                         <td>
-                            {{ player.time }}
+                            - {{ Math.round(player.time / 1000) }}
                         </td>
                     </tr>
                 </table>
@@ -136,7 +136,7 @@ export default {
             this.hardTop.push(response.data[2])
         )
     ).catch(error => {
-        console.error("Ощибка подключения к бэкенду:", error);
+        console.error("Backend connection error:", error);
     })
     
   },
@@ -146,7 +146,7 @@ export default {
       const date = new Date(null);
       date.setSeconds(this.time / 1000);
       const utc = date.toUTCString();
-      return utc.substr(utc.indexOf(":") - 1, 8);
+      return utc.substr(utc.indexOf(":") + 1, 6);
     }
   },
 
@@ -199,8 +199,8 @@ export default {
 
     start() {
       this.timer = setInterval(() => {
-        this.time += 1000;
-      }, 1000);
+        this.time += 10;
+      }, 10);
     },
 
     stop() {

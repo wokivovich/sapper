@@ -1,4 +1,4 @@
-package com.wokivovich.sapper.field;
+package com.wokivovich.sapper.domain;
 
 import lombok.Builder;
 import lombok.Data;
@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 @Builder
 public class FieldBlock {
-    boolean hasBomb;
-    boolean isVisible;
-    boolean isActive;
-    int countOfBombs;
+    private boolean hasBomb;
+    private boolean isVisible;
+    private boolean isActive;
+    private int countOfBombs;
 
     public FieldBlock(boolean hasBomb, boolean isVisible, boolean isActive, int countOfBombs) {
         this.hasBomb = hasBomb;

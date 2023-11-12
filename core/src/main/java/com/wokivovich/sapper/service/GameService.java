@@ -1,17 +1,16 @@
-package com.wokivovich.sapper;
+package com.wokivovich.sapper.service;
 
-import com.wokivovich.sapper.field.GameSession;
+import com.wokivovich.sapper.domain.GameSession;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Reader {
+public class GameService {
 
     public String play(GameSession session, int level, int x, int y) {
             if (session.getField()[y][x].isHasBomb()) {
                 return "LOOSE";
             } else {
                 setVisibleNearestBlocks(session, x, y, level);
-                System.out.println(session.getBlocksLost());
             }
             if (session.getBlocksLost() == 0) {
                 return "WIN";

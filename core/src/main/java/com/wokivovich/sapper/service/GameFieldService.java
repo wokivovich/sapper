@@ -1,14 +1,12 @@
-package com.wokivovich.sapper.field;
+package com.wokivovich.sapper.service;
 
-import com.wokivovich.sapper.field.FieldBlock;
-import org.springframework.context.annotation.Bean;
+import com.wokivovich.sapper.domain.FieldBlock;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Component
-public class FieldGenerator {
+public class GameFieldService {
 
     public FieldBlock[][] createField(int level) {
 
@@ -47,44 +45,44 @@ public class FieldGenerator {
                 int bombs = 0;
 
                 if (j > 0) {
-                    if (field[i][j - 1].hasBomb) {
+                    if (field[i][j - 1].isHasBomb()) {
                         bombs++;
                     }
                     if (i > 0) {
-                        if (field[i - 1][j - 1].hasBomb) {
+                        if (field[i - 1][j - 1].isHasBomb()) {
                             bombs++;
                         }
                     }
                 }
 
                 if (j < tmp) {
-                    if (field[i][j + 1].hasBomb) {
+                    if (field[i][j + 1].isHasBomb()) {
                         bombs++;
                     }
                     if (i > 0) {
-                        if (field[i - 1][j + 1].hasBomb) {
+                        if (field[i - 1][j + 1].isHasBomb()) {
                             bombs++;
                         }
                     }
                 }
 
                 if (i > 0) {
-                    if (field[i - 1][j].hasBomb) {
+                    if (field[i - 1][j].isHasBomb()) {
                         bombs++;
                     }
                 }
 
                 if (i < tmp) {
-                    if (field[i + 1][j].hasBomb) {
+                    if (field[i + 1][j].isHasBomb()) {
                         bombs++;
                     }
                     if (j > 0) {
-                        if (field[i + 1][j - 1].hasBomb) {
+                        if (field[i + 1][j - 1].isHasBomb()) {
                             bombs++;
                         }
                     }
                     if (j < tmp) {
-                        if (field[i + 1][j + 1].hasBomb) {
+                        if (field[i + 1][j + 1].isHasBomb()) {
                             bombs++;
                         }
                     }
